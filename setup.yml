@@ -58,17 +58,6 @@
           - python3-venv
         state: present
 
-    # - name: Set the system hostname
-    #   hostname:
-    #     name: "{{ hostname }}"
-
-    # - name: Update /etc/hosts with new hostname
-    #   lineinfile:
-    #     path: /etc/hosts
-    #     regexp: '^127\.0\.1\.1\s+'
-    #     line: "127.0.1.1   {{ hostname }}"
-    #     state: present
-
     - name: Add pi user to www-data group
       user:
         name: pi
@@ -96,7 +85,13 @@
         group: www-data
         recurse: yes
 
-    - name: Install oh-my-zsh
+    - name: Check if Oh My Zsh is already installed
+      become_user: pi
+      stat:
+        path: "{{ pi_home }}/.oh-my-zsh"
+      register: oh_my_zsh_installed
+
+    - name: Install Oh My Zsh
       become_user: pi
       shell: |
         sh -c "$(curl -fsSL {{ oh_my_zsh_install_script }})" "" --unattended
@@ -104,6 +99,7 @@
         executable: /bin/bash
       environment:
         ZSH: "{{ pi_home }}/.oh-my-zsh"
+      when: not oh_my_zsh_installed.stat.exists
 
     - name: Change default shell to zsh for pi user
       user:
@@ -184,6 +180,7 @@
         msg: "Reboot initiated by Ansible for changes to take effect."
       when: reboot_required
 
+  # Uncomment vars_prompt if you wish to prompt for reboot
   # vars_prompt:
   #   - name: reboot_required
   #     prompt: "Reboot is required to complete the installation. Reboot now? (yes/no)"
