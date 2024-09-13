@@ -156,12 +156,11 @@
         state: started
         enabled: yes
 
-    - name: Create Python virtual environment in pi-timelapse-3
+    - name: Create Python virtual environment in pi-timelapse-3 and install requirements
       pip:
         requirements: "{{ pi_home }}/pi-timelapse-3/requirements.txt"
         virtualenv: "{{ pi_home }}/pi-timelapse-3/venv"
         virtualenv_command: "/usr/bin/python3 -m venv"
-        virtualenv_python: python3
       become_user: pi
 
     - name: Generate UUIDs for extra Wi-Fi networks
