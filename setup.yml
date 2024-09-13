@@ -16,10 +16,15 @@
       # [Your vsftpd.conf content goes here]
 
   tasks:
+    - name: Check if Wi-Fi credentials file exists
+      stat:
+        path: wifi_credentials.yml
+      register: wifi_credentials_file
+
     - name: Include Wi-Fi credentials if available
-      ansible.builtin.include_vars:
+      include_vars:
         file: wifi_credentials.yml
-        optional: true
+      when: wifi_credentials_file.stat.exists
 
     - name: Update apt cache and upgrade packages
       apt:
