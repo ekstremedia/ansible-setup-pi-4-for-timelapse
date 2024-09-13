@@ -17,9 +17,9 @@
 
   tasks:
     - name: Include Wi-Fi credentials if available
-      include_vars:
+      ansible.builtin.include_vars:
         file: wifi_credentials.yml
-        optional: yes
+        optional: true
 
     - name: Update apt cache and upgrade packages
       apt:
@@ -53,16 +53,16 @@
           - python3-venv
         state: present
 
-    - name: Set the system hostname
-      hostname:
-        name: "{{ hostname }}"
+    # - name: Set the system hostname
+    #   hostname:
+    #     name: "{{ hostname }}"
 
-    - name: Update /etc/hosts with new hostname
-      lineinfile:
-        path: /etc/hosts
-        regexp: '^127\.0\.1\.1\s+'
-        line: "127.0.1.1   {{ hostname }}"
-        state: present
+    # - name: Update /etc/hosts with new hostname
+    #   lineinfile:
+    #     path: /etc/hosts
+    #     regexp: '^127\.0\.1\.1\s+'
+    #     line: "127.0.1.1   {{ hostname }}"
+    #     state: present
 
     - name: Add pi user to www-data group
       user:
@@ -167,9 +167,10 @@
       notify: Restart wpa_supplicant
 
     - name: Create Python virtual environment in pi-timelapse-3
-      python_requirements:
-        path: "{{ pi_home }}/pi-timelapse-3/requirements.txt"
+      pip:
+        requirements: "{{ pi_home }}/pi-timelapse-3/requirements.txt"
         virtualenv: "{{ pi_home }}/pi-timelapse-3/venv"
+        virtualenv_command: "/usr/bin/python3 -m venv"
         virtualenv_python: python3
       become_user: pi
 
