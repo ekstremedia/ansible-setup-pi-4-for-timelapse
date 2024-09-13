@@ -34,6 +34,7 @@
     - name: Install required apt packages
       apt:
         name:
+          - locales
           - vim
           - screen
           - neofetch
@@ -183,11 +184,11 @@
         msg: "Reboot initiated by Ansible for changes to take effect."
       when: reboot_required
 
-  vars_prompt:
-    - name: reboot_required
-      prompt: "Reboot is required to complete the installation. Reboot now? (yes/no)"
-      private: no
-      default: yes
+  # vars_prompt:
+  #   - name: reboot_required
+  #     prompt: "Reboot is required to complete the installation. Reboot now? (yes/no)"
+  #     private: no
+  #     default: yes
 
   handlers:
     - name: Restart vsftpd
