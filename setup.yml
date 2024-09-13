@@ -11,318 +11,172 @@
         dest: "{{ pi_home }}/pi-timelapse-3"
       - repo: "https://github.com/ekstremedia/raspberrypi-picamera-timelapse.git"
         dest: "{{ pi_home }}/raspberrypi-picamera-timelapse"
+    hostname: "sortlandcam-new"
     vsftpd_conf_content: |
-      # Example config file /etc/vsftpd.conf
-      #
-      # The default compiled in settings are fairly paranoid. This sample file
-      # loosens things up a bit, to make the ftp daemon more usable.
-      # Please see vsftpd.conf.5 for all compiled in defaults.
-      #
-      #
-      # Run standalone?  vsftpd can run either from an inetd or as a standalone
-      # daemon started from an initscript.
-      listen=NO
-      #
-      # This directive enables listening on IPv6 sockets. By default, listening
-      # on the IPv6 "any" address (::) will accept connections from both IPv6
-      # and IPv4 clients. It is not necessary to listen on *both* IPv4 and IPv6
-      # sockets. If you want that (perhaps because you want to listen on specific
-      # addresses) then you must run two copies of vsftpd with two configuration
-      # files.
-      listen_ipv6=YES
-      #
-      # Allow anonymous FTP? (Disabled by default).
-      anonymous_enable=NO
-      #
-      # Uncomment this to allow local users to log in.
-      local_enable=YES
-      #
-      # Uncomment this to enable any form of FTP write command.
-      #write_enable=YES
-      #
-      # Default umask for local users is 077. You may wish to change this to 022,
-      # if your users expect that (022 is used by most other ftpd's)
-      #local_umask=022
-      #
-      # Uncomment this to allow the anonymous FTP user to upload files. This only
-      # has an effect if the above global write enable is activated. Also, you will
-      # obviously need to create a directory writable by the FTP user.
-      #anon_upload_enable=YES
-      #
-      # Uncomment this if you want the anonymous FTP user to be able to create
-      # new directories.
-      #anon_mkdir_write_enable=YES
-      #
-      # Activate directory messages - messages given to remote users when they
-      # go into a certain directory.
-      dirmessage_enable=YES
-      #
-      # If enabled, vsftpd will display directory listings with the time
-      # in  your  local  time  zone.  The default is to display GMT. The
-      # times returned by the MDTM FTP command are also affected by this
-      # option.
-      use_localtime=YES
-      #
-      # Activate logging of uploads/downloads.
-      xferlog_enable=YES
-      #
-      # Make sure PORT transfer connections originate from port 20 (ftp-data).
-      connect_from_port_20=YES
-      #
-      # If you want, you can arrange for uploaded anonymous files to be owned by
-      # a different user. Note! Using "root" for uploaded files is not
-      # recommended!
-      #chown_uploads=YES
-      #chown_username=whoever
-      #
-      # You may override where the log file goes if you like. The default is shown
-      # below.
-      #xferlog_file=/var/log/vsftpd.log
-      #
-      # If you want, you can have your log file in standard ftpd xferlog format.
-      # Note that the default log file location is /var/log/xferlog in this case.
-      #xferlog_std_format=YES
-      #
-      # You may change the default value for timing out an idle session.
-      #idle_session_timeout=600
-      #
-      # You may change the default value for timing out a data connection.
-      #data_connection_timeout=120
-      #
-      # It is recommended that you define on your system a unique user which the
-      # ftp server can use as a totally isolated and unprivileged user.
-      #nopriv_user=ftpsecure
-      #
-      # Enable this and the server will recognise asynchronous ABOR requests. Not
-      # recommended for security (the code is non-trivial). Not enabling it,
-      # however, may confuse older FTP clients.
-      #async_abor_enable=YES
-      #
-      # By default the server will pretend to allow ASCII mode but in fact ignore
-      # the request. Turn on the below options to have the server actually do ASCII
-      # mangling on files when in ASCII mode.
-      # Beware that on some FTP servers, ASCII support allows a denial of service
-      # attack (DoS) via the command "SIZE /big/file" in ASCII mode. vsftpd
-      # predicted this attack and has always been safe, reporting the size of the
-      # raw file.
-      #ascii_upload_enable=YES
-      #ascii_download_enable=YES
-      #
-      # You may fully customise the login banner string:
-      #ftpd_banner=Welcome to blah FTP service.
-      #
-      # You may specify a file of disallowed anonymous e-mail addresses. Apparently
-      # useful for combatting certain DoS attacks.
-      #deny_email_enable=YES
-      # (default follows)
-      #banned_email_file=/etc/vsftpd.banned_emails
-      #
-      # You may restrict local users to their home directories.  See the FAQ for
-      # the possible risks in this before using chroot_local_user or
-      # chroot_list_enable below.
-      chroot_local_user=YES
-      #
-      # You may specify an explicit list of local users to chroot() to their home
-      # directory. If chroot_local_user is YES, then this list becomes a list of
-      # users to NOT chroot().
-      # (Warning! chroot'ing can be very dangerous. If using chroot, make sure that
-      # the user does not have write access to the top level directory within the
-      # chroot)
-      #chroot_list_enable=YES
-      # (default follows)
-      #chroot_list_file=/etc/vsftpd.chroot_list
-      #
-      # You may activate the "-R" option to the builtin ls. This is disabled by
-      # default to avoid remote users being able to cause excessive I/O on large
-      # sites. However, some broken FTP clients such as "ncftp" and "mirror" assume
-      # the presence of the "-R" option, so there is a strong case for enabling it.
-      #ls_recurse_enable=YES
-      #
-      # Customization
-      #
-      # Some of vsftpd's settings don't fit the filesystem layout by
-      # default.
-      #
-      # This option should be the name of a directory which is empty.  Also, the
-      # directory should not be writable by the ftp user. This directory is used
-      # as a secure chroot() jail at times vsftpd does not require filesystem
-      # access.
-      secure_chroot_dir=/var/run/vsftpd/empty
-      #
-      # This string is the name of the PAM service vsftpd will use.
-      pam_service_name=vsftpd
-      #
-      # This option specifies the location of the RSA certificate to use for SSL
-      # encrypted connections.
-      rsa_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
-      rsa_private_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
-      ssl_enable=NO
-      #
-      # Uncomment this to indicate that vsftpd use a utf8 filesystem.
-      #utf8_filesystem=YES
-      #
-      pasv_enable=YES
-      pasv_min_port=10000
-      pasv_max_port=10100
+      # [Your vsftpd.conf content goes here]
 
   tasks:
+    - name: Include Wi-Fi credentials if available
+      include_vars:
+        file: wifi_credentials.yml
+        optional: yes
 
-  - name: Update apt cache and upgrade packages
-    apt:
-      update_cache: yes
-      upgrade: dist
+    - name: Update apt cache and upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
 
-  - name: Install required apt packages
-    apt:
-      name:
-        - vim
-        - screen
-        - neofetch
-        - tree
-        - ffmpeg
-        - exiftool
-        - zsh
-        - python3-dev
-        - libcap-dev
-        - libcamera-apps
-        - libcamera-dev
-        - python3-libcamera
-        - git
-        - python3-setuptools
-        - python3-kms++
-        - apache2
-        - vsftpd
-        - python3-pyyaml
-        - python3-yaml
-        - python3-colored
-        - raspberrypi-kernel-headers
-      state: present
+    - name: Install required apt packages
+      apt:
+        name:
+          - vim
+          - screen
+          - neofetch
+          - tree
+          - ffmpeg
+          - exiftool
+          - zsh
+          - python3-dev
+          - libcap-dev
+          - libcamera-apps
+          - libcamera-dev
+          - python3-libcamera
+          - git
+          - python3-setuptools
+          - python3-kms++
+          - apache2
+          - vsftpd
+          - python3-pyyaml
+          - python3-yaml
+          - python3-colored
+          - raspberrypi-kernel-headers
+          - python3-venv
+        state: present
 
-  - name: Add pi user to www-data group
-    user:
-      name: pi
-      groups: www-data
-      append: yes
+    - name: Set the system hostname
+      hostname:
+        name: "{{ hostname }}"
 
-  - name: Start and enable Apache2 service
-    service:
-      name: apache2
-      state: started
-      enabled: yes
+    - name: Update /etc/hosts with new hostname
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1\s+'
+        line: "127.0.1.1   {{ hostname }}"
+        state: present
 
-  - name: Create timelapse_images directory
-    file:
-      path: /var/www/html/timelapse_images
-      state: directory
-      owner: pi
-      group: www-data
-      mode: '0755'
+    - name: Add pi user to www-data group
+      user:
+        name: pi
+        groups: www-data
+        append: yes
 
-  - name: Change ownership of /var/www/html to pi
-    file:
-      path: /var/www/html
-      owner: pi
-      group: www-data
-      recurse: yes
+    - name: Start and enable Apache2 service
+      service:
+        name: apache2
+        state: started
+        enabled: yes
 
-  - name: Install oh-my-zsh
-    become_user: pi
-    shell: |
-      sh -c "$(curl -fsSL {{ oh_my_zsh_install_script }})" "" --unattended
-    args:
-      executable: /bin/bash
-    environment:
-      ZSH: "{{ pi_home }}/.oh-my-zsh"
+    - name: Create timelapse_images directory
+      file:
+        path: /var/www/html/timelapse_images
+        state: directory
+        owner: pi
+        group: www-data
+        mode: "0755"
 
-  - name: Change default shell to zsh for pi user
-    user:
-      name: pi
-      shell: /usr/bin/zsh
+    - name: Change ownership of /var/www/html to pi
+      file:
+        path: /var/www/html
+        owner: pi
+        group: www-data
+        recurse: yes
 
-  - name: Install zsh-autosuggestions plugin
-    git:
-      repo: "{{ zsh_autosuggestions_repo }}"
-      dest: "{{ pi_home }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
-      update: no
-    become_user: pi
+    - name: Install oh-my-zsh
+      become_user: pi
+      shell: |
+        sh -c "$(curl -fsSL {{ oh_my_zsh_install_script }})" "" --unattended
+      args:
+        executable: /bin/bash
+      environment:
+        ZSH: "{{ pi_home }}/.oh-my-zsh"
 
-  - name: Update .zshrc with plugins
-    become_user: pi
-    lineinfile:
-      path: "{{ pi_home }}/.zshrc"
-      regexp: '^plugins=\(.*\)'
-      line: 'plugins=(git zsh-autosuggestions)'
+    - name: Change default shell to zsh for pi user
+      user:
+        name: pi
+        shell: /usr/bin/zsh
 
-  - name: Clone repositories
-    git:
-      repo: "{{ item.repo }}"
-      dest: "{{ item.dest }}"
-      update: no
-    become_user: pi
-    loop: "{{ repositories }}"
+    - name: Install zsh-autosuggestions plugin
+      git:
+        repo: "{{ zsh_autosuggestions_repo }}"
+        dest: "{{ pi_home }}/.oh-my-zsh/custom/plugins/zsh-autosuggestions"
+        update: no
+      become_user: pi
 
-  - name: Generate no_NO.UTF-8 locale
-    locale_gen:
-      name: no_NO.UTF-8
-      state: present
+    - name: Update .zshrc with plugins
+      become_user: pi
+      lineinfile:
+        path: "{{ pi_home }}/.zshrc"
+        regexp: '^plugins=\(.*\)'
+        line: "plugins=(git zsh-autosuggestions)"
 
-  - name: Update system locale to no_NO.UTF-8
-    lineinfile:
-      path: /etc/default/locale
-      regexp: '^LANG='
-      line: 'LANG=no_NO.UTF-8'
+    - name: Clone repositories
+      git:
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        update: no
+      become_user: pi
+      loop: "{{ repositories }}"
 
-  - name: Deploy vsftpd configuration
-    copy:
-      content: "{{ vsftpd_conf_content }}"
-      dest: /etc/vsftpd.conf
-      owner: root
-      group: root
-      mode: '0644'
-    notify: Restart vsftpd
+    - name: Generate no_NO.UTF-8 locale
+      locale_gen:
+        name: no_NO.UTF-8
+        state: present
 
-  - name: Ensure vsftpd service is running
-    service:
-      name: vsftpd
-      state: started
-      enabled: yes
+    - name: Update system locale to no_NO.UTF-8
+      lineinfile:
+        path: /etc/default/locale
+        regexp: "^LANG="
+        line: "LANG=no_NO.UTF-8"
 
-  # - name: Install v4l2loopback module dependencies
-  #   apt:
-  #     name:
-  #       - dkms
-  #       - build-essential
-  #       - linux-headers-$(uname -r)
-  #     state: present
+    - name: Deploy vsftpd configuration
+      copy:
+        content: "{{ vsftpd_conf_content }}"
+        dest: /etc/vsftpd.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart vsftpd
 
-  # - name: Clone v4l2loopback repository
-  #   git:
-  #     repo: "https://github.com/umlaeute/v4l2loopback.git"
-  #     dest: /usr/src/v4l2loopback
-  #     version: master
-  #     update: no
+    - name: Ensure vsftpd service is running
+      service:
+        name: vsftpd
+        state: started
+        enabled: yes
 
-  # - name: Build and install v4l2loopback module
-  #   make:
-  #     chdir: /usr/src/v4l2loopback
-  #     target: install
-  #   args:
-  #     creates: "/lib/modules/{{ ansible_kernel }}/updates/dkms/v4l2loopback.ko"
+    - name: Add extra Wi-Fi networks to wpa_supplicant.conf
+      blockinfile:
+        path: /etc/wpa_supplicant/wpa_supplicant.conf
+        marker: "# {mark} Ansible managed network {{ item.ssid }}"
+        block: |
+          network={{
+              ssid="{{ item.ssid }}"
+              psk="{{ item.psk }}"
+          }}
+      loop: "{{ extra_wifi_networks | default([]) }}"
+      when: extra_wifi_networks is defined
+      notify: Restart wpa_supplicant
 
-  # - name: Load v4l2loopback module
-  #   modprobe:
-  #     name: v4l2loopback
-  #     params: video_nr=1
+    - name: Create Python virtual environment in pi-timelapse-3
+      python_requirements:
+        path: "{{ pi_home }}/pi-timelapse-3/requirements.txt"
+        virtualenv: "{{ pi_home }}/pi-timelapse-3/venv"
+        virtualenv_python: python3
+      become_user: pi
 
-  # - name: Add v4l2loopback to /etc/modules
-  #   lineinfile:
-  #     path: /etc/modules
-  #     line: 'v4l2loopback'
-
-  - name: Reboot the system if required
-    reboot:
-      msg: "Reboot initiated by Ansible for changes to take effect."
-    when: reboot_required
+    - name: Reboot the system if required
+      reboot:
+        msg: "Reboot initiated by Ansible for changes to take effect."
+      when: reboot_required
 
   vars_prompt:
     - name: reboot_required
@@ -334,4 +188,9 @@
     - name: Restart vsftpd
       service:
         name: vsftpd
+        state: restarted
+
+    - name: Restart wpa_supplicant
+      service:
+        name: wpa_supplicant
         state: restarted
