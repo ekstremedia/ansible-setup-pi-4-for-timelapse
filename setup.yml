@@ -56,16 +56,8 @@
           - python3-colored
           - raspberrypi-kernel-headers
           - python3-venv
-        state: present
-
-    - name: Ensure NetworkManager is installed
-      apt:
-        name: network-manager
-        state: present
-
-    - name: Install uuid-runtime package (required for uuidgen)
-      apt:
-        name: uuid-runtime
+          - network-manager          # Ensure NetworkManager is installed
+          - uuid-runtime             # Required for uuidgen
         state: present
 
     - name: Add pi user to www-data group
@@ -172,6 +164,12 @@
         virtualenv_python: python3
       become_user: pi
 
+    - name: Generate UUIDs for extra Wi-Fi networks
+      set_fact:
+        extra_wifi_networks_with_uuid: "{{ extra_wifi_networks_with_uuid | default([]) + [ item | combine({'uuid': lookup('pipe', 'uuidgen')}) ] }}"
+      loop: "{{ extra_wifi_networks }}"
+      when: extra_wifi_networks is defined
+
     - name: Add extra Wi-Fi networks to NetworkManager
       blockinfile:
         path: "/etc/NetworkManager/system-connections/{{ item.ssid }}.nmconnection"
@@ -201,21 +199,14 @@
 
           [ipv6]
           method=ignore
-      loop: "{{ extra_wifi_networks }}"
-      when: extra_wifi_networks is defined
-      vars:
-        item_uuid: "{{ lookup('pipe', 'uuidgen') }}"
-      set_fact:
-        item:
-          ssid: "{{ item.ssid }}"
-          psk: "{{ item.psk }}"
-          uuid: "{{ item_uuid }}"
+      loop: "{{ extra_wifi_networks_with_uuid }}"
+      when: extra_wifi_networks_with_uuid is defined
       notify: Restart NetworkManager
 
     - name: Reboot the system if required
       reboot:
         msg: "Reboot initiated by Ansible for changes to take effect."
-      when: reboot_required
+      when: reboot_required | default(false)
 
   # Uncomment vars_prompt if you wish to prompt for reboot
   # vars_prompt:
