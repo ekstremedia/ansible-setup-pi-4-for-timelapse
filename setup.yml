@@ -58,6 +58,16 @@
           - python3-venv
         state: present
 
+    - name: Ensure NetworkManager is installed
+      apt:
+        name: network-manager
+        state: present
+
+    - name: Install uuid-runtime package (required for uuidgen)
+      apt:
+        name: uuid-runtime
+        state: present
+
     - name: Add pi user to www-data group
       user:
         name: pi
@@ -154,19 +164,6 @@
         state: started
         enabled: yes
 
-    - name: Add extra Wi-Fi networks to wpa_supplicant.conf
-      blockinfile:
-        path: /etc/wpa_supplicant/wpa_supplicant.conf
-        marker: "# {mark} Ansible managed network {{ item.ssid }}"
-        block: |
-          network={{
-              ssid="{{ item.ssid }}"
-              psk="{{ item.psk }}"
-          }}
-      loop: "{{ extra_wifi_networks | default([]) }}"
-      when: extra_wifi_networks is defined
-      notify: Restart wpa_supplicant
-
     - name: Create Python virtual environment in pi-timelapse-3
       pip:
         requirements: "{{ pi_home }}/pi-timelapse-3/requirements.txt"
@@ -174,6 +171,46 @@
         virtualenv_command: "/usr/bin/python3 -m venv"
         virtualenv_python: python3
       become_user: pi
+
+    - name: Add extra Wi-Fi networks to NetworkManager
+      blockinfile:
+        path: "/etc/NetworkManager/system-connections/{{ item.ssid }}.nmconnection"
+        create: yes
+        owner: root
+        group: root
+        mode: '600'
+        block: |
+          [connection]
+          id={{ item.ssid }}
+          uuid={{ item.uuid }}
+          type=wifi
+          interface-name=wlan0
+          permissions=
+
+          [wifi]
+          mode=infrastructure
+          ssid={{ item.ssid }}
+
+          [wifi-security]
+          auth-alg=open
+          key-mgmt=wpa-psk
+          psk={{ item.psk }}
+
+          [ipv4]
+          method=auto
+
+          [ipv6]
+          method=ignore
+      loop: "{{ extra_wifi_networks }}"
+      when: extra_wifi_networks is defined
+      vars:
+        item_uuid: "{{ lookup('pipe', 'uuidgen') }}"
+      set_fact:
+        item:
+          ssid: "{{ item.ssid }}"
+          psk: "{{ item.psk }}"
+          uuid: "{{ item_uuid }}"
+      notify: Restart NetworkManager
 
     - name: Reboot the system if required
       reboot:
@@ -193,7 +230,7 @@
         name: vsftpd
         state: restarted
 
-    - name: Restart wpa_supplicant
+    - name: Restart NetworkManager
       service:
-        name: wpa_supplicant
+        name: NetworkManager
         state: restarted
