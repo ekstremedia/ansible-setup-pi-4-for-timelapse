@@ -128,16 +128,16 @@
       become_user: pi
       loop: "{{ repositories }}"
 
-    - name: Generate no_NO.UTF-8 locale
+    - name: Generate nb_NO.UTF-8 locale
       locale_gen:
-        name: no_NO.UTF-8
+        name: nb_NO.UTF-8
         state: present
 
-    - name: Update system locale to no_NO.UTF-8
+    - name: Update system locale to nb_NO.UTF-8
       lineinfile:
         path: /etc/default/locale
         regexp: "^LANG="
-        line: "LANG=no_NO.UTF-8"
+        line: "LANG=nb_NO.UTF-8"
 
     - name: Deploy vsftpd configuration
       copy:
