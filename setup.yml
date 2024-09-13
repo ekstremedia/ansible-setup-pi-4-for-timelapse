@@ -49,6 +49,7 @@
           - python3-libcamera
           - git
           - python3-setuptools
+          - python3-picamera2
           - python3-kms++
           - apache2
           - vsftpd
